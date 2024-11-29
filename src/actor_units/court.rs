@@ -21,12 +21,9 @@ impl Court {
         x < 0.0 || x >= self.width_x || y > self.width_z
     }
 
-    pub fn is_raid_successful(&self, position: (f32, f32), is_struggling: bool) -> bool {
+    pub fn is_raid_successful(&self, player: &Player) -> bool {
         // レイダーがコートの左側に到達した時、ストラグル中なら成功
-        if position.0 < 0.0 && is_struggling {
-            return true;
-        }
-        false
+        player.position.0 < 0.0 && player.is_struggling
     }
 }
 

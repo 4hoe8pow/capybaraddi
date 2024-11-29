@@ -1,4 +1,4 @@
-use crate::actor_units::player::Player;
+use crate::actor_units::player::{Action, Player};
 use rand::prelude::SliceRandom;
 use std::collections::HashMap;
 
@@ -27,7 +27,7 @@ impl Agent {
         }
     }
 
-    // 動的に次の行動候補を生成するメソッド
+    // 次の行動候補を生成
     pub fn get_next_actions(&self, player: &Player) -> Vec<Action> {
         let mut actions = vec![
             Action::MoveForward,
@@ -36,7 +36,7 @@ impl Agent {
             Action::MoveRight,
         ];
 
-        // 例えば、条件によって特定のアクションを追加する例
+        // 条件によって特定のアクションを追加する例
         if player.can_struggle() {
             actions.push(Action::Struggle);
         }
@@ -114,17 +114,4 @@ impl From<Vec<String>> for Agent {
             _ => Agent::default(), // 引数が不足している場合はデフォルトを使用
         }
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Action {
-    MoveForward,
-    MoveBackward,
-    MoveLeft,
-    MoveRight,
-    Struggle,
-    Retreat,
-    Avoid,
-    Capture,
-    PushOut,
 }

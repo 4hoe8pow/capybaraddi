@@ -1,7 +1,7 @@
 mod actor_units;
 mod agent;
 mod environments;
-use crate::agent::{Action, Agent};
+use crate::agent::Agent;
 use crate::environments::{RaidEnv, SimulationEnvironment};
 use plotters::prelude::*;
 use std::env;
@@ -14,38 +14,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 環境の初期化
     let mut env = RaidEnv::new(7)?;
 
-    // エポック数
-    let num_epochs = 1000;
+    // エピソード数
+    let episodes = 1000;
 
-    // 各エポックの報酬を格納するベクタ
-    let rewards: Vec<f32> = (0..num_epochs)
+    // 各エピソードの報酬を格納するベクタ
+    let rewards: Vec<f32> = (0..episodes)
         .map(|_| {
-            let mut player = env.raider;
+            let mut player = env.raider; // 初期状態のプレイヤー
             let mut total_reward = 0.0;
 
-            // 1エポック内で最大30ステップ実行
+            // 最大30ステップ (秒)
             for _ in 0..30 {
-                // 動次の行動候補を取得
+                // 1. エージェントが行動を選択
                 let next_actions = agent.get_next_actions(&player);
-
-                // エージェントが行動を選択
                 let action = agent.choose_action(player, &next_actions);
 
-                // 環境の状態を更新し、次の状態と報酬を取得
+                // 2. 環境の状態を更新し、次の状態と報酬を取得
                 let (next_player, reward) = env.step(action);
 
-                // Qテーブルを更新
-                agent.update_q_table(player, action, reward, next_player, &next_actions);
+                // 3. Qテーブルを更新
+                let next_next_actions = agent.get_next_actions(&next_player);
+                agent.update_q_table(player, action, reward, next_player, &next_next_actions);
 
-                // 探索率を減衰
+                // 4. 探索率を減衰
                 agent.decay_exploration();
 
-                // 報酬を加算し、プレイヤーの状態を更新
+                // 5. 報酬を加算し、プレイヤーの状態を更新
                 total_reward += reward;
                 player = next_player;
 
-                // 終了条件：ラインアウト
-                if env.court.is_out_of_bounds(player) {
+                // 終了条件を満たしたらエピソードを終了
+                if env.court.is_raid_successful(&player) {
                     break;
                 }
             }

@@ -1,6 +1,19 @@
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Action {
+    MoveForward,
+    MoveBackward,
+    MoveLeft,
+    MoveRight,
+    Struggle,
+    Retreat,
+    Avoid,
+    Capture,
+    PushOut,
+}
+
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Player {
     pub id: i32,
